@@ -91,7 +91,5 @@ public class User {
         this.email = email;
     }
 
-    public UserDO toModel() {
 
-    }
 }

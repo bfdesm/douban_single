@@ -11,7 +11,7 @@ public class CommentDO {
 
     private String refId;
 
-    private String userId;
+    private long userId;
 
     private String content;
 
@@ -37,11 +37,11 @@ public class CommentDO {
         this.refId = refId;
     }
 
-    public String getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
@@ -89,7 +89,7 @@ public class CommentDO {
         comment.setGmtModified(getGmtModified());
 
         User user = new User();
-        user.setId(getUserId());
+        user.setId(String.valueOf(getUserId()));
         comment.setAuthor(user);
 
         comment.setContent(getContent());
