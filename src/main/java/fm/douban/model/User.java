@@ -2,6 +2,7 @@ package fm.douban.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.NullSerializer;
+import fm.douban.dataobject.UserDO;
 
 public class User {
 
@@ -88,5 +89,9 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public UserDO toModel() {
+
     }
 }

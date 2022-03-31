@@ -2,6 +2,7 @@ package fm.douban.service.impl;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import fm.douban.dao.UserDAO;
 import fm.douban.model.User;
 import fm.douban.param.UserQueryParam;
 import fm.douban.service.UserService;
@@ -29,16 +30,17 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
+    private UserDAO userDAO;
+
+    @Autowired
     private MongoTemplate mongoTemplate;
 
     @Override
     public User add(User user) {
-        // 作为服务，要对入参进行判断，不能假设被调用时，传入的一定是真正的对象
         if (user == null) {
             LOG.error("input User data is null.");
             return null;
         }
-
         return mongoTemplate.insert(user);
     }
 
