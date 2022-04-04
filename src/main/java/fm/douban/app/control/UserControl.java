@@ -50,56 +50,19 @@ public class UserControl {
     }
 
     @GetMapping(path = "/login")
-    public String loginPage(Model model) {
+    public String login() {
         return "login";
     }
 
-    @PostMapping(path = "/authenticate")
-    @ResponseBody
-    public Map login(@RequestParam String name, @RequestParam String password, HttpServletRequest request,
-                     HttpServletResponse response) throws IOException {
-        Map returnData = new HashMap();
-        // 根据登录名查询用户
-        User regedUser = getUserByLoginName(name);
-
-        // 找不到此登录用户
-        if (regedUser == null) {
-            returnData.put("result", false);
-            returnData.put("message", "userName not correct");
-            return returnData;
-        }
-
-        String saltPwd = password + name;
-        String md5Pwd = DigestUtils.md5Hex(saltPwd).toUpperCase();
-        if (!md5Pwd.equals(regedUser.getPassword())) {
-            returnData.put("result", false);
-            returnData.put("message", "password not correct");
-            return returnData;
-        }
-
-        UserLoginInfo userLoginInfo = new UserLoginInfo();
-        userLoginInfo.setUserId(regedUser.getId());
-        userLoginInfo.setUserName(name);
-        // 取得 HttpSession 对象
-        HttpSession session = request.getSession();
-        // 写入登录信息
-        session.setAttribute("userLoginInfo", userLoginInfo);
-        returnData.put("result", true);
-        returnData.put("message", "login successfule");
-
-        response.sendRedirect("/index");
-        return returnData;
-    }
-
     @GetMapping(path = "/sign")
-    public String signPage(Model model) {
+    public String sign() {
         return "sign";
     }
 
     @PostMapping(path = "/register")
     @ResponseBody
-    public Map registerAction(@RequestParam String name, @RequestParam String mobile, @RequestParam String password,
-                              @RequestParam String password_r, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public Map register(@RequestParam String name, @RequestParam String mobile, @RequestParam String password,
+                        @RequestParam String password_r, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map returnData = new HashMap();
         if (!password_r.equals(password)) {
             returnData.put("result", false);
@@ -125,7 +88,7 @@ public class UserControl {
         user.setLoginName(name);
 
         // 密码加自定义盐值，确保密码安全
-        String saltPwd = password + name;
+        String saltPwd = password + "password";
         // 生成md5值，并转大写字母
         String md5Pwd = DigestUtils.md5Hex(saltPwd).toUpperCase();
 
@@ -140,8 +103,44 @@ public class UserControl {
             returnData.put("result", false);
             returnData.put("message", "register failed");
         }
+        UserLoginInfo userLoginInfo = new UserLoginInfo();
+        userLoginInfo.setUserId(regedUser.getId());
+        userLoginInfo.setUserName(name);
         response.sendRedirect("/index");
-        request.getSession().setAttribute("userLoginInfo", name);
+        request.getSession().setAttribute("userLoginInfo", userLoginInfo);
+        return returnData;
+    }
+
+    @PostMapping(path = "/authenticate")
+    @ResponseBody
+    public Map authenticate(@RequestParam String name, @RequestParam String password, HttpServletRequest request,
+                     HttpServletResponse response) throws IOException {
+        Map returnData = new HashMap();
+
+        User regedUser = getUserByLoginName(name);
+        if (regedUser == null) {
+            returnData.put("result", false);
+            returnData.put("message", "userName not correct");
+            return returnData;
+        }
+
+        String saltPwd = password + "password";
+        String md5Pwd = DigestUtils.md5Hex(saltPwd).toUpperCase();
+        if (!md5Pwd.equals(regedUser.getPassword())) {
+            returnData.put("result", false);
+            returnData.put("message", "password not correct");
+            return returnData;
+        }
+
+        UserLoginInfo userLoginInfo = new UserLoginInfo();
+        userLoginInfo.setUserId(regedUser.getId());
+        userLoginInfo.setUserName(name);
+        HttpSession session = request.getSession();
+        session.setAttribute("userLoginInfo", userLoginInfo);
+
+        returnData.put("result", true);
+        returnData.put("message", "login successfule");
+        response.sendRedirect("/index");
         return returnData;
     }
 
@@ -151,7 +150,6 @@ public class UserControl {
         param.setLoginName(loginName);
         Page<User> users = userService.list(param);
 
-        // 如果登录名正确，只取第一个，要保证用户名不能重复
         if (users != null && users.getContent() != null && users.getContent().size() > 0) {
             regedUser = users.getContent().get(0);
         }

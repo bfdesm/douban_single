@@ -21,7 +21,7 @@
         <result column="gmt_created" property="gmtCreated"/>
         <result column="gmt_modified" property="gmtModified"/>
         <association property="author" javaType="fm.douban.model.User">
-            <id property="id" column="user_id"/>
+            <id column="user_id" property="id" />
             <result column="name" property="name"/>
             <result column="login_name" property="loginName"/>
             <result column="logo" property="logo"/>
@@ -42,6 +42,10 @@
         VALUES(#{refId}, #{userId}, #{content}, #{parentId},now(),now())
     </insert>
 
+    <delete id="delete">
+        delete from comment where id=#{id}
+    </delete>
+
     <update id="update" parameterType="fm.douban.dataobject.CommentDO">
         update comment set
         <if test="content != null">
@@ -49,10 +53,6 @@
         </if>
         gmt_modified=now() where id=#{id}
     </update>
-
-    <delete id="delete">
-        delete from comment where id=#{id}
-    </delete>
 
     <select id="findAll" resultMap="commentResultMap">
         select * from comment

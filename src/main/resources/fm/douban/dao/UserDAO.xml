@@ -29,6 +29,10 @@
         VALUES(#{userName}, #{pwd}, #{nickName}, #{avatar},now(),now())
     </insert>
 
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+
     <update id="update" parameterType="fm.douban.dataobject.UserDO">
         update user
         <set>
@@ -39,10 +43,6 @@
         gmt_modified=now()
         where id=#{id}
     </update>
-
-    <delete id="delete">
-        delete from user where id=#{id}
-    </delete>
 
     <select id="findAll" resultMap="userResultMap">
         select * from user

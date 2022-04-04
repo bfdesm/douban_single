@@ -75,7 +75,7 @@ public class MainControl {
     }
 
     @GetMapping(path = "/layout")
-    public String layout(Model model) {
+    public String layout() {
         return "layout";
     }
 
@@ -88,13 +88,11 @@ public class MainControl {
 
         Map result = new HashMap<>();
         result.put("songs", songs);
-        LOG.info("searchContent success");
         return result;
     }
 
     @GetMapping(path = "/my")
-    public String myPage(Model model, HttpServletRequest request, HttpServletResponse response) {
-        // 取得 HttpSession 对象
+    public String my(Model model, HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         UserLoginInfo userLoginInfo = (UserLoginInfo) session.getAttribute("userLoginInfo");
 
@@ -123,13 +121,10 @@ public class MainControl {
         return "my";
     }
 
-    // 喜欢或不喜欢操作。对前端比较简单，不必判断状态
-    // 已经喜欢，则删除，表示执行不喜欢操作
-    // 还没有喜欢记录，则新增，表示执行喜欢操作
     @GetMapping(path = "/fav")
     @ResponseBody
-    public Map doFav(@RequestParam(name = "itemType") String itemType, @RequestParam(name = "itemId") String itemId,
-                     HttpServletRequest request, HttpServletResponse response) {
+    public Map fav(@RequestParam(name = "itemType") String itemType, @RequestParam(name = "itemId") String itemId,
+                     HttpServletRequest request) {
         Map resultData = new HashMap();
         // 取得 HttpSession 对象
         HttpSession session = request.getSession();
@@ -166,8 +161,7 @@ public class MainControl {
     }
 
     @GetMapping(path = "/user")
-    public String myPage(Model model, @RequestParam("userId")String userId) {
-
+    public String user(Model model, @RequestParam("userId")String userId) {
         Favorite fav = new Favorite();
         fav.setUserId(userId);
         fav.setType(FavoriteUtil.TYPE_RED_HEART);
@@ -201,27 +195,15 @@ public class MainControl {
 
             model.addAttribute("song", resultSong);
 
-            List<String> singerIds = resultSong.getSingerIds();
-
-            List<Singer> singers = new ArrayList<>();
-            if (singerIds != null && !singerIds.isEmpty()) {
-
-                for (String singerId : singerIds) {
-                    Singer singer = singerService.get(singerId);
-                    singers.add(singer);
-                }
-            }
+            List<Singer> singers = singerService.getSingersByIds(resultSong.getSingerIds());
 
             model.addAttribute("singers", singers);
         }
     }
 
     private void setMhzData(Model model) {
-        // 查询所有的mhz数据
         List<Subject> subjectDatas = subjectService.getSubjects(SubjectUtil.TYPE_MHZ);
 
-        // 在内存中分类，避免查询四次。
-        // 查询数据库由于有网络请求，效率比用程序分类低
         List<Subject> artistDatas = subjectService.getRandomSubject(SubjectUtil.TYPE_MHZ, SubjectUtil.TYPE_SUB_ARTIST, 10);
         List<Subject> moodDatas = new ArrayList<>();
         List<Subject> ageDatas = new ArrayList<>();

@@ -45,26 +45,27 @@ public class SubjectControl {
             singer = new Singer();
             singer.setId(singerId);
             singer = singerSpider.getSingerBySingerId(singerId, singer);
-            LOG.error("not singer");
         }
+        model.addAttribute("singer", singer);
         Subject subject = subjectService.getSubjectByName(singer.getName() + " 系");
         if (subject == null) {
             subject = new Subject();
         }
-        if(subject.getSongIds()!=null && subject.getSongIds().size()!=0){
+        model.addAttribute("subject", subject);
+        if(subject.getSongIds() != null && subject.getSongIds().size() != 0){
             model.addAttribute("songs", songService.getSongs(subject.getSongIds()));
         }else{
-            List<Song> songs = songService.getSongs(subject.getSongIds());
-            if(songs == null || songs.size() == 0)
-                songs = songService.getRandomSong(8);
+            List<Song> songs = songService.getRandomSong(8);
             model.addAttribute("songs", songs);
         }
-        model.addAttribute("subject", subject);
-        model.addAttribute("singer", singer);
-        if(singer.getSimilarSingerIds() == null || singer.getSimilarSingerIds().size()==0){
-            model.addAttribute("simSingers", singerService.getRandom(8));
-        }else
-            model.addAttribute("simSingers", singerService.getSingersByIds(singer.getSimilarSingerIds()));
+        List<Singer> simSingers;
+        if(singer.getSimilarSingerIds() == null || singer.getSimilarSingerIds().size() == 0)
+            simSingers = singerService.getRandom(8);
+        else{
+            simSingers = singerService.getSingersByIds(singer.getSimilarSingerIds());
+            simSingers = simSingers.size() > 8? simSingers.subList(0,8):simSingers;
+        }
+        model.addAttribute("simSingers", simSingers);
         return "artist";
     }
 
@@ -93,17 +94,13 @@ public class SubjectControl {
                         if(singer==null){
                             singer = new Singer();
                             singer.setId(subject.getMaster());
-                            singer = singerSpider.getSingerBySingerId(subject.getMaster(),singer);
+                            singer = singerSpider.getSingerBySingerId(subject.getMaster(), singer);
                         }
                         xvm.setSinger(singer);
                     }
 
                     if (subject.getSongIds() != null && !subject.getSongIds().isEmpty()) {
-                        List<Song> songs = new ArrayList<>();
-                        for (String songId : subject.getSongIds()) {
-                            Song song = songService.get(songId);
-                            songs.add(song);
-                        }
+                        List<Song> songs = songService.getSongs(subject.getSongIds());
                         xvm.setSongs(songs);
                     }
                     column.add(xvm);
@@ -160,24 +157,18 @@ public class SubjectControl {
         List<String> songIds = subject.getSongIds();
         List<Song> songs = new ArrayList<>();
         if (songIds != null && !songIds.isEmpty()) {
-            for (String songId : songIds) {
-                Song song = songService.get(songId);
-                if (song != null) {
-                    songs.add(song);
-                    for(String id: song.getSingerIds())
-                        simSingers.add(singerService.get(id));
-                }
-            }
+            songs = songService.getSongs(subject.getSongIds());
+            List<Singer> finalSimSingers = simSingers;
+            songs.forEach(song -> finalSimSingers.addAll(singerService.getSingersByIds(song.getSingerIds())));
         }
+        if(songs != null && songs.size() >= 5)
+            songs = songs.subList(0,5);
+        model.addAttribute("songs", songs);
         HashSet set = new HashSet(simSingers);
         //把List集合所有元素清空
         simSingers.clear();
         //把HashSet对象添加至List集合
         simSingers.addAll(set);
-        if(songs.size()>=5)
-            model.addAttribute("songs", songs.subList(0,5));
-        else
-            model.addAttribute("songs", songs);
         if (simSingers.size() == 0) {
             simSingers = singerService.getRandom(5);
         }

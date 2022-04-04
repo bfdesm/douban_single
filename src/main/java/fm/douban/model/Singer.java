@@ -45,8 +45,7 @@ public class Singer {
     }
 
     public int hashCode() {
-        String in = name;
-        return in.hashCode();
+        return name.hashCode();
     }
 
     public String getId() {

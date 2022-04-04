@@ -73,7 +73,7 @@ public class SongServiceImpl implements SongService {
         Criteria criteria = new Criteria();
         // 可能有多个子条件
         List<Criteria> subCris = new ArrayList();
-        if(songIds ==null)
+        if(songIds == null)
             return getRandomSong(8);
         for (String id : songIds) {
             subCris.add(Criteria.where("id").is(id));

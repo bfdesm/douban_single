@@ -25,11 +25,9 @@ public class SingerControl {
     @Autowired
     private SingerSpider singerSpider;
 
-    private Random random = new Random();
-
     @GetMapping(path = "/userguide")
     public String myMhz(Model model) {
-        List<Singer> randomSingers = randomSingers();
+        List<Singer> randomSingers = singerService.getRandom(8);
         model.addAttribute("singers", randomSingers);
         return "userguide";
     }
@@ -46,7 +44,7 @@ public class SingerControl {
     public String getSingerName(@RequestParam("singerId")String singerId){
         Singer singer = singerService.get(singerId);
         if(singer == null)
-            singer = singerSpider.getSingerBySingerId(singerId,singer);
+            singer = singerSpider.getSingerBySingerId(singerId, singer);
         return singer.getName();
     }
 }

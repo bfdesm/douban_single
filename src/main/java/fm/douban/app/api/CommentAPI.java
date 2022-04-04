@@ -2,6 +2,7 @@ package fm.douban.app.api;
 
 import fm.douban.model.Comment;
 import fm.douban.model.Result;
+import fm.douban.model.UserLoginInfo;
 import fm.douban.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,7 +27,8 @@ public class CommentAPI {
     @ResponseBody
     public Result<Comment> post(@RequestParam("refId") String refId, @RequestParam(value = "parentId") Long parentId,
                                 @RequestParam("content") String content, HttpServletRequest request) {
-        long userId = (long) request.getSession().getAttribute("userId");
+        UserLoginInfo userLoginInfo = (UserLoginInfo) request.getSession().getAttribute("userLoginInfo");
+        long userId = Long.parseLong(userLoginInfo.getUserId());
         return commentService.post(refId, userId, parentId, content);
     }
 
