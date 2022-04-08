@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author zeyu
+ * 发送验证码到邮箱
+ */
 @Controller
 public class SMSCodeApi {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -47,17 +51,17 @@ public class SMSCodeApi {
         //当redis没有数据的时候再去数据库查询
         if (code == null) {
             //redis缓存没有，为了安全起见
-            double code1 = (Math.random()*9+1)*10000;
+            double code1 = (Math.random() * 9 + 1) * 10000;
             Boolean sendResult = sendMailService.sendMail(mail, (int)code1+"");
             if(!sendResult) {
                 result.setSuccess(false);
                 result.setMessage("发送验证码失败！");
                 return result;
             }
-            redisTemplate.opsForValue().set(mail, (int)code1, 1, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(mail, (int)code1, 5, TimeUnit.MINUTES);
         }
         result.setSuccess(false);
-        result.setMessage("请等待1min");
+        result.setMessage("请等待1min，验证码有效时间为5min，请注意您的邮箱");
         return result;
     }
 
@@ -66,7 +70,7 @@ public class SMSCodeApi {
     public Result verificate(@RequestParam("mail") String mail, @RequestParam("code") int code) {
         Result result = new Result();
         result.setSuccess(true);
-        //步骤一
+
         if (StringUtils.isEmpty(mail) || StringUtils.isEmpty(code)) {
             result.setSuccess(false);
             result.setMessage("邮箱和验证码不能为空");
@@ -74,7 +78,6 @@ public class SMSCodeApi {
         }
         Object existCode = redisTemplate.opsForValue().get(mail);
 
-        //步骤二
         // 取出的验证码不能为空
         if (existCode == null) {
             result.setSuccess(false);

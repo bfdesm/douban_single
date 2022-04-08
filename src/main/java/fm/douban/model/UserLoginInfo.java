@@ -3,7 +3,7 @@ package fm.douban.model;
 import java.io.Serializable;
 
 /**
- * 演示用的用户登录信息
+ * 用户登录信息
  */
 public class UserLoginInfo implements Serializable {
     private String userId;

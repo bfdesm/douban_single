@@ -21,12 +21,12 @@ public class SendMailServiceImpl implements SendMailService {
         message.setFrom("1780934510@qq.com");
         message.setTo(mail);
         message.setSubject("验证码");
-        message.setText("验证码是："+code);
+        message.setText("验证码是：" + code);
         try {
             mailSender.send(message);
             return true;
         } catch (Exception e) {
-            logger.error("发送邮件时发生异常了！", e);
+            logger.error("Send Mail occured a Error！", e);
             return false;
         }
     }

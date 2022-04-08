@@ -15,4 +15,5 @@ public class AppConfigurer implements WebMvcConfigurer {
                 .addPathPatterns("/my")
                 .addPathPatterns("/fav");
     }
+
 }
