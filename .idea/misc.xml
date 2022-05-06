@@ -5,16 +5,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/main.application/pom.xml" />
-        <option value="$PROJECT_DIR$/user.application/pom.xml" />
-        <option value="$PROJECT_DIR$/subject.application/pom.xml" />
-        <option value="$PROJECT_DIR$/song.application/pom.xml" />
-        <option value="$PROJECT_DIR$/singer.application/pom.xml" />
-        <option value="$PROJECT_DIR$/favorite.application/pom.xml" />
-        <option value="$PROJECT_DIR$/comment.application/pom.xml" />
-        <option value="$PROJECT_DIR$/api.application/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" default="true" project-jdk-name="corretto-16" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>
